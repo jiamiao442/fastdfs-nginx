@@ -2,7 +2,7 @@
 #FROM centos:7
 FROM alpine:3.16
 
-LABEL maintainer "379289162@qq.com"
+LABEL maintainer="379289162@qq.com"
 
 ENV FASTDFS_PATH=/usr/local/src \
   FASTDFS_BASE_PATH=/data/fdfs \
@@ -14,7 +14,7 @@ ENV FASTDFS_PATH=/usr/local/src \
   PORT= \
   GROUP_NAME= \
   TRACKER_SERVER= \
-  TZ=Asia/Shanghai
+  TZ="Asia/Shanghai"
 
 
 WORKDIR ${FASTDFS_PATH}
@@ -39,7 +39,7 @@ RUN echo "http://mirrors.aliyun.com/alpine/v3.16/main" > /etc/apk/repositories \
   && cd fastdfs \
   && ./make.sh \
   && ./make.sh install \
-  && rm -rf ${FASTDFS_PATH}/fastdfs
+  && rm -rf ${FASTDFS_PATH}/fastdfs \
   && git clone -b $FASTDFS_NGINX_MODULE_VERSION https://github.com/happyfish100/fastdfs-nginx-module.git fastdfs-nginx-module \
   && wget https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz \
   && tar -zxf nginx-${NGINX_VERSION}.tar.gz \
@@ -52,7 +52,7 @@ RUN echo "http://mirrors.aliyun.com/alpine/v3.16/main" > /etc/apk/repositories \
   && ln -s /usr/local/nginx/sbin/nginx /usr/bin/ \
   && rm -rf ${FASTDFS_PATH}/nginx-* \
   && rm -rf ${FASTDFS_PATH}/fastdfs-nginx-module \
-  &&  apk del .build-deps \
+  && apk del .build-deps \
   && rm -rf /var/cache/apk/*
 
 EXPOSE 22122 23000 8080 8888 80
@@ -65,7 +65,7 @@ COPY nginx_conf.d/*.conf /usr/local/nginx/conf.d/
 COPY entrypoint.sh /usr/bin/
 
 #make the entrypoint.sh executable 
-RUN chmod a+x /usr/bin/entrypoint.sh
+RUN chmod a+x /usr/bin/entrypoint.sh \
    && apk add --no-cache bash pcre-dev zlib-dev \
    && apk add -U tzdata \
    && cp /usr/share/zoneinfo/$TZ /etc/localtime \
