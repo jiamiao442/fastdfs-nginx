@@ -58,9 +58,9 @@ RUN echo "http://mirrors.aliyun.com/alpine/v3.16/main" > /etc/apk/repositories \
 EXPOSE 22122 23000 8080 8888 80
 VOLUME ["$FASTDFS_BASE_PATH","/etc/fdfs","/usr/local/nginx/conf/conf.d"]   
 
-COPY conf/*.* /etc/fdfs/
-COPY nginx_conf/nginx.conf /usr/local/nginx/conf/
-COPY nginx_conf.d/*.conf /usr/local/nginx/conf.d/
+COPY fastdfs-conf/conf/*.* /etc/fdfs/
+COPY fastdfs-conf/nginx_conf/nginx.conf /usr/local/nginx/conf/
+COPY fastdfs-conf/nginx_conf.d/*.conf /usr/local/nginx/conf.d/
 
 COPY entrypoint.sh /usr/bin/
 
