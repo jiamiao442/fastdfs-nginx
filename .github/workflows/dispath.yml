@@ -34,15 +34,10 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
-          username: ${{ github.actor }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+           username: ${{ secrets.DOCKERHUB_USERNAME }}
+           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Log in to the Container registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+
 
       - name: Build and push Docker images
         uses: docker/build-push-action@v4
@@ -52,7 +47,7 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: |
-            ygqygq2/fastdfs-nginx:${{ inputs.tag }}
+            jiamiao442/fastdfs-nginx:${{ inputs.tag }}
 
       - name: Docker Compose Action
         uses: isbang/compose-action@v1.4.1
