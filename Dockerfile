@@ -22,25 +22,23 @@ WORKDIR ${FASTDFS_PATH}
 #RUN yum install -y git gcc make wget pcre pcre-devel openssl openssl-devel \
 #  && rm -rf /var/cache/yum/*
 # 0.change the system source for installing libs
-RUN echo "http://mirrors.aliyun.com/alpine/v3.16/main" > /etc/apk/repositories \
-  && echo "http://mirrors.aliyun.com/alpine/v3.16/community" >> /etc/apk/repositories \
-  && apk update  && apk add --no-cache --virtual .build-deps bash autoconf gcc libc-dev make pcre-dev zlib-dev linux-headers gnupg libxslt-dev gd-dev geoip-dev wget \
-  && git clone -b $LIBFASTCOMMON_VERSION https://github.com/happyfish100/libfastcommon.git libfastcommon \
+RUN  apk update  && apk add --no-cache --virtual .build-deps bash autoconf gcc libc-dev make pcre-dev zlib-dev linux-headers gnupg libxslt-dev gd-dev geoip-dev wget \
+  && git clone -b ${LIBFASTCOMMON_VERSION} https://github.com/happyfish100/libfastcommon.git libfastcommon \
   && cd libfastcommon \
   && ./make.sh \
   && ./make.sh install \
   && rm -rf ${FASTDFS_PATH}/libfastcommon \
-  && git clone -b $LIBSERVERFRAME_VERSION https://github.com/happyfish100/libserverframe.git libserverframe \
+  && git clone -b ${LIBSERVERFRAME_VERSION} https://github.com/happyfish100/libserverframe.git libserverframe \
   && cd libserverframe \
   && ./make.sh \
   && ./make.sh install \
   && rm -rf ${FASTDFS_PATH}/libserverframe \
-  && git clone -b $FASTDFS_VERSION https://github.com/happyfish100/fastdfs.git fastdfs \
+  && git clone -b ${FASTDFS_VERSION} https://github.com/happyfish100/fastdfs.git fastdfs \
   && cd fastdfs \
   && ./make.sh \
   && ./make.sh install \
   && rm -rf ${FASTDFS_PATH}/fastdfs \
-  && git clone -b $FASTDFS_NGINX_MODULE_VERSION https://github.com/happyfish100/fastdfs-nginx-module.git fastdfs-nginx-module \
+  && git clone -b ${FASTDFS_NGINX_MODULE_VERSION} https://github.com/happyfish100/fastdfs-nginx-module.git fastdfs-nginx-module \
   && wget https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz \
   && tar -zxf nginx-${NGINX_VERSION}.tar.gz \
   && cd nginx-${NGINX_VERSION} \
@@ -56,7 +54,7 @@ RUN echo "http://mirrors.aliyun.com/alpine/v3.16/main" > /etc/apk/repositories \
   && rm -rf /var/cache/apk/*
 
 EXPOSE 22122 23000 8080 8888 80
-VOLUME ["$FASTDFS_BASE_PATH","/etc/fdfs","/usr/local/nginx/conf/conf.d"]   
+VOLUME ["${FASTDFS_BASE_PATH}","/etc/fdfs","/usr/local/nginx/conf/conf.d"]
 
 COPY fastdfs-conf/conf/*.* /etc/fdfs/
 COPY fastdfs-conf/nginx_conf/nginx.conf /usr/local/nginx/conf/
