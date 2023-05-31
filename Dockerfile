@@ -11,9 +11,9 @@ ENV FASTDFS_PATH=/usr/local/src \
   FASTDFS_NGINX_MODULE_VERSION="V1.23" \
   FASTDFS_VERSION="V6.9.4" \
   NGINX_VERSION="1.23.3" \
-  PORT= \
-  GROUP_NAME= \
-  TRACKER_SERVER= \
+  PORT='' \
+  GROUP_NAME='' \
+  TRACKER_SERVER='' \
   TZ="Asia/Shanghai"
 
 
@@ -34,7 +34,7 @@ RUN echo "http://mirrors.aliyun.com/alpine/v3.16/main" > /etc/apk/repositories \
   && cd libserverframe \
   && ./make.sh \
   && ./make.sh install \
-  && rm -rf ${FASTDFS_PATH}/libserverframe
+  && rm -rf ${FASTDFS_PATH}/libserverframe \
   && git clone -b $FASTDFS_VERSION https://github.com/happyfish100/fastdfs.git fastdfs \
   && cd fastdfs \
   && ./make.sh \
