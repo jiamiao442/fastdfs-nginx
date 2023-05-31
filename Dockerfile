@@ -22,7 +22,7 @@ WORKDIR ${FASTDFS_PATH}
 #RUN yum install -y git gcc make wget pcre pcre-devel openssl openssl-devel \
 #  && rm -rf /var/cache/yum/*
 # 0.change the system source for installing libs
-RUN  apk update  && apk add --no-cache --virtual .build-deps bash autoconf gcc libc-dev make pcre-dev zlib-dev linux-headers gnupg libxslt-dev gd-dev geoip-dev wget \
+RUN  apk update  && apk add --no-cache --virtual .build-deps bash autoconf gcc libc-dev make pcre-dev zlib-dev linux-headers gnupg libxslt-dev gd-dev geoip-dev wget git \
   && git clone -b ${LIBFASTCOMMON_VERSION} https://github.com/happyfish100/libfastcommon.git libfastcommon \
   && cd libfastcommon \
   && ./make.sh \
