@@ -28,30 +28,9 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
-          username: ${{ github.actor }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Log in to the Container registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: |
-            ghcr.io/${{ github.repository }}/fastdfs-nginx
-            ygqygq2/fastdfs-nginx
-
-      - name: Convert fastdfs tengine tag
-        id: convert
-        run: |
-          DOCKER_METADATA_OUTPUT_NEW_TAGS=$(echo ${DOCKER_METADATA_OUTPUT_TAGS}-tengine|sed 's@ @-tengine,@g')
-          echo "DOCKER_METADATA_OUTPUT_NEW_TAGS: $DOCKER_METADATA_OUTPUT_NEW_TAGS"
-          echo "DOCKER_METADATA_OUTPUT_NEW_TAGS=${DOCKER_METADATA_OUTPUT_NEW_TAGS}" >> $GITHUB_OUTPUT
 
       - name: Build and push Docker images 1
         uses: docker/build-push-action@v4
