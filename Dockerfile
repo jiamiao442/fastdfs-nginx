@@ -18,9 +18,9 @@ ENV FASTDFS_PATH=/usr/local/src \
 
 RUN mkdir -p ${FASTDFS_PATH}/libfastcommon \
   && mkdir -p ${FASTDFS_PATH}/libserverframe \
-  && mkdir -p ${FASTDFS_PATH}/fastdfs \\
-    && mkdir -p ${FASTDFS_PATH}/fastdfs-nginx-module \
-  && mkdir -p ${FASTDFS_BASE_PATH} \
+  && mkdir -p ${FASTDFS_PATH}/fastdfs \
+  && mkdir -p ${FASTDFS_PATH}/fastdfs-nginx-module \
+  && mkdir -p ${FASTDFS_BASE_PATH}
 
 WORKDIR ${FASTDFS_PATH}
 #get all the dependences and nginx
