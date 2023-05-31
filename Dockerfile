@@ -61,7 +61,7 @@ RUN  apk update  && apk add --no-cache --virtual .build-deps bash autoconf gcc l
   && apk del .build-deps \
   && rm -rf /var/cache/apk/*
 
-EXPOSE 22122 23000 8080 8888 80
+EXPOSE 22122 23000 9088
 VOLUME ["${FASTDFS_BASE_PATH}","/etc/fdfs","/usr/local/nginx/conf/conf.d"]
 
 COPY fastdfs-conf/conf/*.* /etc/fdfs/
