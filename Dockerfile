@@ -33,16 +33,19 @@ RUN  apk update  && apk add --no-cache --virtual .build-deps bash autoconf gcc l
   && ./make.sh \
   && ./make.sh install \
   && rm -rf ${FASTDFS_PATH}/libfastcommon \
+  && cd ..   \
   && git clone -b ${LIBSERVERFRAME_VERSION} https://github.com/happyfish100/libserverframe.git libserverframe \
   && cd libserverframe \
   && ./make.sh \
   && ./make.sh install \
   && rm -rf ${FASTDFS_PATH}/libserverframe \
+  && cd ..  \
   && git clone -b ${FASTDFS_VERSION} https://github.com/happyfish100/fastdfs.git fastdfs \
   && cd fastdfs \
   && ./make.sh \
   && ./make.sh install \
   && rm -rf ${FASTDFS_PATH}/fastdfs \
+  && cd .. \
   && git clone -b ${FASTDFS_NGINX_MODULE_VERSION} https://github.com/happyfish100/fastdfs-nginx-module.git fastdfs-nginx-module \
   && wget https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz \
   && tar -zxf nginx-${NGINX_VERSION}.tar.gz \
