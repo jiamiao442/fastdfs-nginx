@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/bash
 #
 # 用途：配置tracker \ storage的配置文件参数，liyanjing 2022.08.10
 #
@@ -7,16 +7,16 @@
 # 1. tracker 主要参数，生产环境中建议更改一下端口
 tracker_port=22122
 # 实现互备，两台tracker就够了
-tracker_server="tracker_server = 172.16.100.90:$tracker_port\ntracker_server = 172.16.100.91:$tracker_port"
+tracker_server="tracker_server = 192.168.174.132:$tracker_port\ntracker_server = 192.168.174.150:$tracker_port"
 
 # 格式：<id>  <group_name>  <ip_or_hostname
 storage_ids="
-100001   group1  172.16.100.90
-100002   group2  172.16.100.91
+100001   group1  192.168.174.132
+100002   group1  192.168.174.150
 "
 
 # 设置tracker访问IP限制，避免谁都能上传文件，默认是allow_hosts = *
-allow_hosts="allow_hosts = 172.16.100.[85-91,83]\n"
+allow_hosts="allow_hosts = 192.168.174.0/24\n"
 
 # 2. local storage 主要参数，生产环境中建议更改一下端口
 storage_group_name="group1"
