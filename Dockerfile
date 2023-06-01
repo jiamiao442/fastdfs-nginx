@@ -74,7 +74,7 @@ COPY entrypoint.sh /usr/bin/
 RUN chmod a+x /usr/bin/entrypoint.sh \
    && apk add --no-cache bash pcre-dev zlib-dev \
    && apk add -U tzdata \
-   && cp /usr/share/zoneinfo/$TZ /etc/localtime \
+   && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
    && echo $TZ > /etc/timezone \
    && apk del tzdata \
    && rm -rf /var/cache/apk/*
