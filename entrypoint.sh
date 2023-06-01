@@ -1,105 +1,55 @@
-#!/bin/bash
-#set -e
-if [ "$debug" = "true" ]; then
-    set -x
+#!/bin/sh
+
+# fastdfs 配置文件，我设置的存储路径，需要提前创建
+FASTDFS_BASE_PATH=/data/fastdfs_data \
+FASTDFS_STORE_PATH=/data/fastdfs/upload \
+
+# 启用参数
+# - tracker : 启动tracker_server 服务
+# - storage : 启动storage 服务
+start_parameter=$1
+
+if [ ! -d "$FASTDFS_BASE_PATH" ];  then
+	 mkdir -p ${FASTDFS_BASE_PATH};
 fi
 
-GROUP_NAME=${GROUP_NAME:-group1}
-if [ -n "$GET_TRACKER_SERVER" ]; then
-    export TRACKER_SERVER=$(eval $GET_TRACKER_SERVER)
-fi
+function start_tracker(){
 
-function fdfs_set() {
-    if [ "$1" = "monitor" ] ; then
-        if [ -n "$TRACKER_SERVER" ] ; then  
-          sed -i "s|tracker_server[ ]*=[ ]*.*$|tracker_server = ${TRACKER_SERVER}|g" /etc/fdfs/client.conf
-        fi
-        fdfs_monitor /etc/fdfs/client.conf
-        exit 0
-    elif [ "$1" = "storage" ] ; then
-        FASTDFS_MODE="storage"
-    else 
-        FASTDFS_MODE="tracker"
-    fi
-    
-    if [ -n "$PORT" ] ; then  
-        sed -i "s|^port[ ]*=[ ]*.*$|port = ${PORT}|g" /etc/fdfs/"$FASTDFS_MODE".conf
-    fi
-    
-    if [ -n "$TRACKER_SERVER" ] ; then  
-        sed -i "s|^tracker_server[ ]*=[ ]*.*$|tracker_server = ${TRACKER_SERVER}|g" /etc/fdfs/storage.conf
-        sed -i "s|^tracker_server[ ]*=[ ]*.*$|tracker_server = ${TRACKER_SERVER}|g" /etc/fdfs/client.conf
-        sed -i "s|^tracker_server[ ]*=[ ]*.*$|tracker_server = ${TRACKER_SERVER}|g" /etc/fdfs/mod_fastdfs.conf
-    fi
-    
-    sed -i "s|^group_name[ ]*=[ ]*.*$|group_name = ${GROUP_NAME}|g" /etc/fdfs/storage.conf
-    sed -i "s|^group_name[ ]*=[ ]*.*$|group_name = ${GROUP_NAME}|g" /etc/fdfs/mod_fastdfs.conf
-}
-    
-function fdfs_start() {
-    FASTDFS_LOG_FILE="${FASTDFS_BASE_PATH}/logs/${FASTDFS_MODE}d.log"
-    PID_NUMBER="${FASTDFS_BASE_PATH}/data/fdfs_${FASTDFS_MODE}d.pid"
-    
-    echo "try to start the $FASTDFS_MODE node..."
-    fdfs_${FASTDFS_MODE}d /etc/fdfs/${FASTDFS_MODE}.conf stop
-    if [ -f "$FASTDFS_LOG_FILE" ]; then 
-        rm -f "$FASTDFS_LOG_FILE"
-    fi
-    if [ -f "$PID_NUMBER" ]; then
-        rm -f "$PID_NUMBER"
-    fi
+  /usr/bin/fdfs_trackerd /etc/fdfs/tracker.conf
+  tail -f /data/fastdfs_data/logs/trackerd.log
 
-    # start the fastdfs node.	
-    fdfs_${FASTDFS_MODE}d /etc/fdfs/${FASTDFS_MODE}.conf start
 }
 
-function nginx_set() {
-    # start nginx.
-    if [ "${FASTDFS_MODE}" = "storage" ]; then
-        cp -f /nginx_conf/conf.d/${FASTDFS_MODE}.conf /usr/local/nginx/conf/conf.d/
-        sed -i "s|group1|${GROUP_NAME}|g" /usr/local/nginx/conf/conf.d/${FASTDFS_MODE}.conf
-    fi
-    /usr/local/nginx/sbin/nginx
+function start_storage(){
+  if [ ! -d "$FASTDFS_STORE_PATH" ]; then
+	     mkdir -p ${FASTDFS_STORE_PATH}/{path0,path1,path2,path3};
+  fi
+  /usr/bin/fdfs_storaged /etc/fdfs/storage.conf;
+  sleep 5
+
+  # nginx日志存储目录为/data/fastdfs_data/logs/，手动创建一下，防止storage启动慢，还没有来得及创建logs目录
+  if [ ! -d "$FASTDFS_BASE_PATH/logs" ];  then
+	 mkdir -p ${FASTDFS_BASE_PATH}/logs;
+  fi
+
+  /usr/local/nginx/sbin/nginx;
+  tail -f /data/fastdfs_data/logs/storaged.log;
 }
 
-function health_check() {
-    if [ $HOSTNAME = "localhost.localdomain" ]; then
-        return 0
-    fi
-    # Storage OFFLINE, restart storage.
-    monitor_log=/tmp/monitor.log
-    check_log=/tmp/health_check.log
-    while true; do
-        fdfs_monitor /etc/fdfs/client.conf 1>$monitor_log 2>&1
-        cat $monitor_log|grep $HOSTNAME > $check_log 2>&1
-        error_log=$(egrep "OFFLINE" "$check_log")
-        if [ ! -z "$error_log" ]; then
-            cat /dev/null > "$FASTDFS_LOG_FILE"
-            fdfs_start
-        fi
-        sleep 10
-    done
-}
+function run (){
 
-fdfs_set $*
-nginx_set $*
-fdfs_start
-health_check &
-
-# wait for pid file(important!),the max start time is 30 seconds,if the pid number does not appear in 30 seconds,start failed.
-TIMES=30
-while [ ! -f "$PID_NUMBER" -a $TIMES -gt 0 ]
-do
-    sleep 1s
-    TIMES=`expr $TIMES - 1`
-done
-
-case $1 in
-    monitor|storage|tracker)
-    # sleep infinity
-    [ -f "$FASTDFS_LOG_FILE" ] && tail -f "$FASTDFS_LOG_FILE"
+  case ${start_parameter} in
+    tracker)
+     echo "启动tracker"
+     start_tracker
+    ;;
+    storage)
+       echo "启动storage"
+       start_storage
     ;;
     *)
-    exec "$@"
-    ;;
-esac
+       echo "请指定要启动哪个服务，tracker还是storage（二选一），传参为tracker | storage"
+  esac
+}
+
+run
