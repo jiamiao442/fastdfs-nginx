@@ -52,7 +52,7 @@ $storage_ids
 EOF
 
   # 设置tracker访问IP限制，避免谁都能上传文件，默认是allow_hosts = *
-  #sed -i '/^allow_hosts/{N;/^allow_hosts/s/.*/'"${allow_hosts}"'/}' ./conf/tracker.conf
+   sed -i "/^allow_hosts/ {N;/^allow_hosts/s|.*|${allow_hosts}|}" ./conf/tracker.conf
 }
 
 function storage_confset() {
