@@ -73,9 +73,9 @@ COPY entrypoint.sh /usr/bin/
 #make the entrypoint.sh executable 
 RUN chmod a+x /usr/bin/entrypoint.sh \
    && apk add --no-cache bash pcre-dev zlib-dev \
-   && apk add -U tzdata \
-   && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
-   && echo $TZ > /etc/timezone \
+   && apk add --no-cache alpine-conf  \
+   && /sbin/setup-timezone -z ${TZ} \
+   && apk del alpine-conf \
    && rm -rf /var/cache/apk/*
 
 WORKDIR ${FASTDFS_PATH}
