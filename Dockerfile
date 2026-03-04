@@ -31,7 +31,8 @@ RUN apt-get update && \
 # 配置时区为 Asia/Shanghai
 RUN echo $TZ > /etc/timezone && \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
-    dpkg-reconfigure --frontend noninteractive tzdata
+    dpkg-reconfigure --frontend noninteractive tzdata \
+
 # get all the dependences
 RUN apt-get update && apt-get install -y curl git gcc make wget libpcre3 libpcre3-dev zlib1g zlib1g-dev openssl libssl-dev liburing-dev \
   && rm -rf /var/lib/apt/lists/*
