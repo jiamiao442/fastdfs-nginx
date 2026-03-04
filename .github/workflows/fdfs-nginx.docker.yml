@@ -33,15 +33,15 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
 
-      - name: Build and push Docker images 1
-        uses: docker/build-push-action@v4
-        with:
-          context: ./
-          file: ./Dockerfile-tengine
-          push: true
-          tags: ${{ steps.convert.outputs.DOCKER_METADATA_OUTPUT_NEW_TAGS }}
-          labels: ${{ steps.meta.outputs.labels }}
-          platforms: linux/amd64,linux/arm64            
+ #     - name: Build and push Docker images 1
+ #       uses: docker/build-push-action@v4
+ #       with:
+ #         context: ./
+ #         file: ./Dockerfile-tengine
+ #         push: true
+ #         tags: ${{ steps.convert.outputs.DOCKER_METADATA_OUTPUT_NEW_TAGS }}
+ #         labels: ${{ steps.meta.outputs.labels }}
+ #         platforms: linux/amd64,linux/arm64
 
       - name: Build and push Docker images 2
         uses: docker/build-push-action@v4
