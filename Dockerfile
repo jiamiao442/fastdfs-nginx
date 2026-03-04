@@ -36,12 +36,6 @@ RUN echo $TZ > /etc/timezone && \
 RUN apt-get update && apt-get install -y curl git gcc make wget libpcre3 libpcre3-dev zlib1g zlib1g-dev openssl libssl-dev liburing-dev \
   && rm -rf /var/lib/apt/lists/*
 
-# create the dirs to store the files downloaded from internet
-RUN mkdir -p ${FASTDFS_PATH}/libfastcommon \
-  && mkdir -p ${FASTDFS_PATH}/fastdfs \
-  && mkdir -p ${FASTDFS_PATH}/fastdfs-nginx-module \
-  && mkdir ${FASTDFS_BASE_PATH} \
-  && mkdir /nginx_conf && mkdir -p /usr/local/nginx/conf/conf.d
 
 WORKDIR ${FASTDFS_PATH}
 
