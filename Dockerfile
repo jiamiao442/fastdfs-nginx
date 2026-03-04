@@ -1,16 +1,15 @@
 ## Dockerfile
-#FROM centos:7
-FROM alpine:3.19.1
+FROM ubuntu:24.04
 
 LABEL maintainer="379289162@qq.com"
 
 ENV FASTDFS_PATH=/usr/local/src \
   FASTDFS_BASE_PATH=/data/fdfs \
-  LIBFASTCOMMON_VERSION="V1.0.73" \
-  LIBSERVERFRAME_VERSION="V1.2.3" \
-  FASTDFS_NGINX_MODULE_VERSION="V1.24" \
-  FASTDFS_VERSION="V6.12.1" \
-  NGINX_VERSION="1.24.0" \
+  LIBFASTCOMMON_VERSION="V1.0.84" \
+  LIBSERVERFRAME_VERSION="V1.2.11" \
+  FASTDFS_NGINX_MODULE_VERSION="V1.26" \
+  FASTDFS_VERSION="V6.15.2" \
+  NGINX_VERSION="1.28.2" \
   PORT='' \
   GROUP_NAME='' \
   TRACKER_SERVER='' \
@@ -23,30 +22,49 @@ RUN mkdir -p ${FASTDFS_PATH}/libfastcommon \
   && mkdir -p ${FASTDFS_BASE_PATH}
 
 WORKDIR ${FASTDFS_PATH}
-#get all the dependences and nginx
-#RUN yum install -y git gcc make wget pcre pcre-devel openssl openssl-devel \
-#  && rm -rf /var/cache/yum/*
-# 0.change the system source for installing libs
-RUN  apk update  && apk add --no-cache --virtual .build-deps bash autoconf gcc libc-dev make pcre-dev zlib-dev linux-headers gnupg libxslt-dev gd-dev geoip-dev wget git \
-  && git clone -b ${LIBFASTCOMMON_VERSION} https://github.com/happyfish100/libfastcommon.git libfastcommon \
+
+# 安装 tzdata 包以配置时区
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends tzdata && \
+    rm -rf /var/lib/apt/lists/*
+
+# 配置时区为 Asia/Shanghai
+RUN echo $TZ > /etc/timezone && \
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+    dpkg-reconfigure --frontend noninteractive tzdata
+# get all the dependences
+RUN apt-get update && apt-get install -y curl git gcc make wget libpcre3 libpcre3-dev zlib1g zlib1g-dev openssl libssl-dev liburing-dev \
+  && rm -rf /var/lib/apt/lists/*
+
+
+WORKDIR ${FASTDFS_PATH}
+
+## compile the libfastcommon
+RUN git clone --depth=1 -b $LIBFASTCOMMON_VERSION https://github.com/happyfish100/libfastcommon.git libfastcommon \
   && cd libfastcommon \
   && ./make.sh \
   && ./make.sh install \
-  && rm -rf ${FASTDFS_PATH}/libfastcommon \
-  && cd ..   \
-  && git clone -b ${LIBSERVERFRAME_VERSION} https://github.com/happyfish100/libserverframe.git libserverframe \
+  && rm -rf ${FASTDFS_PATH}/libfastcommon
+
+## compile the libserverframe
+RUN git clone --depth=1 -b $LIBSERVERFRAME_VERSION https://github.com/happyfish100/libserverframe.git libserverframe \
   && cd libserverframe \
   && ./make.sh \
   && ./make.sh install \
-  && rm -rf ${FASTDFS_PATH}/libserverframe \
-  && cd ..  \
-  && git clone -b ${FASTDFS_VERSION} https://github.com/happyfish100/fastdfs.git fastdfs \
+  && rm -rf ${FASTDFS_PATH}/libserverframe
+
+## compile the fastdfs
+RUN git clone --depth=1 -b $FASTDFS_VERSION https://github.com/happyfish100/fastdfs.git fastdfs \
   && cd fastdfs \
   && ./make.sh \
   && ./make.sh install \
-  && rm -rf ${FASTDFS_PATH}/fastdfs \
-  && cd .. \
-  && git clone -b ${FASTDFS_NGINX_MODULE_VERSION} https://github.com/happyfish100/fastdfs-nginx-module.git fastdfs-nginx-module \
+  && rm -rf ${FASTDFS_PATH}/fastdfs
+
+
+## comile nginx
+# nginx url: https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz
+# tengine url: http://tengine.taobao.org/download/tengine-${TENGINE_VERSION}.tar.gz
+RUN git clone --depth=1 -b $FASTDFS_NGINX_MODULE_VERSION https://github.com/happyfish100/fastdfs-nginx-module.git fastdfs-nginx-module \
   && wget https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz \
   && tar -zxf nginx-${NGINX_VERSION}.tar.gz \
   && cd nginx-${NGINX_VERSION} \
@@ -57,9 +75,7 @@ RUN  apk update  && apk add --no-cache --virtual .build-deps bash autoconf gcc l
   && make install \
   && ln -s /usr/local/nginx/sbin/nginx /usr/bin/ \
   && rm -rf ${FASTDFS_PATH}/nginx-* \
-  && rm -rf ${FASTDFS_PATH}/fastdfs-nginx-module \
-  && apk del .build-deps \
-  && rm -rf /var/cache/apk/*
+  && rm -rf ${FASTDFS_PATH}/fastdfs-nginx-module
 
 EXPOSE 22122 23000 9088
 VOLUME ["${FASTDFS_BASE_PATH}","/etc/fdfs","/usr/local/nginx/conf/conf.d"]
@@ -71,12 +87,7 @@ COPY fastdfs-conf/nginx_conf.d/*.conf /usr/local/nginx/conf.d/
 COPY entrypoint.sh /usr/bin/
 
 #make the entrypoint.sh executable 
-RUN chmod a+x /usr/bin/entrypoint.sh \
-   && apk add --no-cache bash pcre-dev zlib-dev \
-   && apk add --no-cache alpine-conf  \
-   && /sbin/setup-timezone -z ${TZ} \
-   && apk del alpine-conf \
-   && rm -rf /var/cache/apk/*
+RUN chmod a+x /usr/bin/entrypoint.sh
 
 WORKDIR ${FASTDFS_PATH}
 
