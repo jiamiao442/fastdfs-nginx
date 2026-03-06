@@ -60,8 +60,8 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm64
 
-      - name: Docker Compose Action
-        uses: isbang/compose-action@v1.4.1
-        with:
-          compose-file: './docker-compose.yml'
-          down-flags: '--volumes'
+      #- name: Docker Compose Action
+      #  uses: isbang/compose-action@v1.4.1
+      #  with:
+      #    compose-file: './docker-compose.yml'
+      #    down-flags: '--volumes'
