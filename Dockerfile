@@ -6,9 +6,9 @@ LABEL maintainer="379289162@qq.com"
 ENV FASTDFS_PATH=/usr/local/src \
   FASTDFS_BASE_PATH=/data/fdfs \
   LIBFASTCOMMON_VERSION="V1.0.84" \
-  LIBSERVERFRAME_VERSION="V1.2.11" \
+  LIBSERVERFRAME_VERSION="master" \
   FASTDFS_NGINX_MODULE_VERSION="V1.26" \
-  FASTDFS_VERSION="V6.15.2" \
+  FASTDFS_VERSION="V6.15.3" \
   NGINX_VERSION="1.28.2" \
   PORT='' \
   GROUP_NAME='' \
@@ -31,11 +31,12 @@ RUN apt-get update && \
 # 配置时区为 Asia/Shanghai
 RUN echo $TZ > /etc/timezone && \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
-    dpkg-reconfigure --frontend noninteractive tzdata \
+    dpkg-reconfigure --frontend noninteractive tzdata
 
 # get all the dependences
 RUN apt-get update && apt-get install -y curl git gcc make wget libpcre3 libpcre3-dev zlib1g zlib1g-dev openssl libssl-dev liburing-dev \
   && rm -rf /var/lib/apt/lists/*
+
 
 WORKDIR ${FASTDFS_PATH}
 

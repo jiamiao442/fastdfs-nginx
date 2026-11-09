@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # fastdfs 配置文件，我设置的存储路径，需要提前创建
 FASTDFS_BASE_PATH=/data/fastdfs_data \

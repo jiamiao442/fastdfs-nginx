@@ -32,16 +32,23 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-
-      - name: Build and push Docker images 1
-        uses: docker/build-push-action@v4
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
         with:
-          context: ./
-          file: ./Dockerfile-tengine
-          push: true
-          tags: ${{ steps.convert.outputs.DOCKER_METADATA_OUTPUT_NEW_TAGS }}
-          labels: ${{ steps.meta.outputs.labels }}
-          platforms: linux/amd64,linux/arm64            
+          images: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/fastdfs-nginx
+
+ #     - name: Build and push Docker images 1
+ #       uses: docker/build-push-action@v4
+ #       with:
+ #         context: ./
+ #         file: ./Dockerfile-tengine
+ #         push: true
+ #         tags: ${{ steps.convert.outputs.DOCKER_METADATA_OUTPUT_NEW_TAGS }}
+ #         labels: ${{ steps.meta.outputs.labels }}
+ #         platforms: linux/amd64,linux/arm64
+
 
       - name: Build and push Docker images 2
         uses: docker/build-push-action@v4
@@ -53,8 +60,8 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm64
 
-      - name: Docker Compose Action
-        uses: isbang/compose-action@v1.4.1
-        with:
-          compose-file: './docker-compose.yml'
-          down-flags: '--volumes'
+      #- name: Docker Compose Action
+      #  uses: isbang/compose-action@v1.4.1
+      #  with:
+      #    compose-file: './docker-compose.yml'
+      #    down-flags: '--volumes'
