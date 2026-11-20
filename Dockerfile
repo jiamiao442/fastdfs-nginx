@@ -8,8 +8,8 @@ ENV FASTDFS_PATH=/usr/local/src \
   LIBFASTCOMMON_VERSION="V1.0.88" \
   LIBSERVERFRAME_VERSION="V1.2.15" \
   FASTDFS_NGINX_MODULE_VERSION="V1.26" \
-  FASTDFS_VERSION="V6.18.1" \
-  NGINX_VERSION="1.30.6" \
+  FASTDFS_VERSION="V6.18.2" \
+  NGINX_VERSION="1.30.7" \
   PORT='' \
   GROUP_NAME='' \
   TRACKER_SERVER='' \
@@ -36,7 +36,6 @@ RUN echo $TZ > /etc/timezone && \
 # get all the dependences
 RUN apt-get update && apt-get install -y curl git gcc make wget libpcre3 libpcre3-dev zlib1g zlib1g-dev openssl libssl-dev liburing-dev \
   && rm -rf /var/lib/apt/lists/*
-
 
 WORKDIR ${FASTDFS_PATH}
 
